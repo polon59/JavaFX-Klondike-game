@@ -149,6 +149,8 @@ public class Game extends Pane {
 
 
     private void initPiles() {
+        int amount;
+        int firstElement = 0;
         stockPile = new Pile(Pile.PileType.STOCK, "Stock", STOCK_GAP);
         stockPile.setBlurredBackground();
         stockPile.setLayoutX(95);
@@ -177,12 +179,21 @@ public class Game extends Pane {
             tableauPile.setLayoutY(275);
             tableauPiles.add(tableauPile);
             getChildren().add(tableauPile);
+
+            amount = i+1;
+            for(int j = amount; j > 0; j--){
+                if(j == 1) {deck.get(firstElement).flip();}
+
+                tableauPile.addCard(deck.get(firstElement));
+                addMouseEventHandlers(deck.get(firstElement));
+                getChildren().add(deck.get(firstElement));
+                deck.remove(deck.get(firstElement));
+            }
         }
     }
 
     public void dealCards() {
         Iterator<Card> deckIterator = deck.iterator();
-        //TODO
         deckIterator.forEachRemaining(card -> {
             stockPile.addCard(card);
             addMouseEventHandlers(card);
