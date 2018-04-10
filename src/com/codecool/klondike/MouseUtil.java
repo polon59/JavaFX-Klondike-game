@@ -46,6 +46,7 @@ public class MouseUtil {
             targetY = destPile.getTopCard().getLayoutY();
         }
 
+
         for (int i = 0; i < cardsToSlide.size(); i++) {
             Card currentCard = cardsToSlide.get(i);
             double sourceX = currentCard.getLayoutX() + currentCard.getTranslateX();
