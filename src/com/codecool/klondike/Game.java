@@ -88,22 +88,28 @@ public class Game extends Pane {
         if (draggedCards.isEmpty())
             return;
         Card card = (Card) e.getSource();
-        Pile pile = getValidIntersectingPile(card, tableauPiles);
-        Card topCard = pile.getTopCard();
-
-        if (pile != null) {
-
-            if (pile.getTopCard() == null && checkCardIsKing(card)) {
-                handleValidMove(card, pile);
+        
+        try {
+            Pile pile = getValidIntersectingPile(card, tableauPiles);
+            Card topCard = pile.getTopCard();
+            if (pile != null) {
+                
+                if (topCard == null && checkCardIsKing(card)) {
+                    handleValidMove(card, pile);
+                }
+    
+                else if (card.isOppositeColor(card, topCard) && isRankSmaller(card, topCard)) {
+                    handleValidMove(card, pile);
+                }
+    
+                else {
+                    invalidCardMove(draggedCards);
+                }
             }
 
-            else if (card.isOppositeColor(card, topCard) && isRankSmaller(card, topCard)) {
-                handleValidMove(card, pile);
-            }
-
-            else {
-                invalidCardMove(draggedCards);
-            }
+        } catch (NullPointerException a) {
+            System.out.println("Intercepted Null Pointer Error");
+            invalidCardMove(draggedCards);
         }
     };
 
