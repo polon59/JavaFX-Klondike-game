@@ -79,8 +79,7 @@ public class Game extends Pane {
         Card card = (Card) e.getSource();
         Pile pile = getValidIntersectingPile(card, tableauPiles);
         Card topCard = pile.getTopCard();
-        //TODO
-
+        Pile pile2 = getValidIntersectingPile(card, foundationPiles);
 
 
         if (pile != null) {
@@ -106,6 +105,32 @@ public class Game extends Pane {
             draggedCards.clear();
             System.out.println("slide back");
         }
+
+        if (pile2 != null) {
+
+            if (pile.getTopCard() == null){
+                if (card.getRank() == 1);
+                    handleValidMove(card, pile);
+                
+            }
+            //Code dirty to me
+
+        //     else if (card.isOppositeColor(card, pile.getTopCard())){
+        //         handleValidMove(card, pile);
+        //         System.out.println("handle valid move");
+        //     }
+            
+        //     else {
+        //         draggedCards.forEach(MouseUtil::slideBack);
+        //         draggedCards.clear();
+        //         System.out.println("INVALIID MOVE");
+        //     }
+
+        // } else {
+        //     draggedCards.forEach(MouseUtil::slideBack);
+        //     draggedCards.clear();
+        //     System.out.println("slide back");
+         }
     };
 
     public boolean isGameWon() {
@@ -166,6 +191,9 @@ public class Game extends Pane {
         System.out.println(msg);
         MouseUtil.slideToDest(draggedCards, destPile);
         draggedCards.clear();
+        flipDownedCards();
+
+
     }
 
 
@@ -227,6 +255,15 @@ public class Game extends Pane {
         setBackground(new Background(new BackgroundImage(tableBackground,
                 BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
                 BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
+    }
+
+    public void flipDownedCards() {
+        Iterator<Pile> fliper = tableauPiles.iterator();
+        fliper.forEachRemaining(pile1 -> {
+            if (pile1.getTopCard().isFaceDown()){
+                pile1.getTopCard().flip();
+            }
+        });
     }
 
 }
