@@ -80,59 +80,40 @@ public class Game extends Pane {
         Card card = (Card) e.getSource();
         Pile pile = getValidIntersectingPile(card, tableauPiles);
         Card topCard = pile.getTopCard();
-        Pile pile2 = getValidIntersectingPile(card, foundationPiles);
-
 
         if (pile != null) {
 
-            if (pile.getTopCard() == null){
-                handleValidMove(card, pile);
-                
+            if (pile.getTopCard() == null && checkCardIsKing(card)){
+                handleValidMove(card, pile);   
             }
 
-            else if (card.isOppositeColor(card, pile.getTopCard())){
+            else if (card.isOppositeColor(card, topCard) && isRankSmaller(card, topCard)){ 
                 handleValidMove(card, pile);
-                System.out.println("handle valid move");
             }
-            
+
             else {
-                draggedCards.forEach(MouseUtil::slideBack);
-                draggedCards.clear();
-                System.out.println("INVALIID MOVE");
+                invalidCardMove(draggedCards);
             }
-
-        } else {
-            draggedCards.forEach(MouseUtil::slideBack);
-            draggedCards.clear();
-            System.out.println("slide back");
-        }
-
-        if (pile2 != null) {
-
-            if (pile.getTopCard() == null){
-                if (card.getRank() == 1);
-                    handleValidMove(card, pile);
-                
-            }
-            //Code dirty to me
-
-        //     else if (card.isOppositeColor(card, pile.getTopCard())){
-        //         handleValidMove(card, pile);
-        //         System.out.println("handle valid move");
-        //     }
-            
-        //     else {
-        //         draggedCards.forEach(MouseUtil::slideBack);
-        //         draggedCards.clear();
-        //         System.out.println("INVALIID MOVE");
-        //     }
-
-        // } else {
-        //     draggedCards.forEach(MouseUtil::slideBack);
-        //     draggedCards.clear();
-        //     System.out.println("slide back");
-         }
+        } 
     };
+
+    public boolean isRankSmaller(Card card, Card topCard){
+        if (card.getRank() == topCard.getRank() -1){
+            return true;
+        }
+        else {return false;}
+    }
+
+    public boolean checkCardIsKing(Card card){
+        if (card.getRank() == 13){return true;}
+        else {return false;}
+    }
+
+    public void invalidCardMove(List<Card> draggedCards){
+        draggedCards.forEach(MouseUtil::slideBack);
+        draggedCards.clear();
+        System.out.println("INVALIID MOVE");
+    }
 
     public boolean isGameWon() {
         //TODO
