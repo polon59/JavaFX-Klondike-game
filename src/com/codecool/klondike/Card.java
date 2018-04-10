@@ -12,6 +12,8 @@ public class Card extends ImageView {
     private int suit;
     private int rank;
     private boolean faceDown;
+    private String RED = "red";
+    private String BLACK = "black";
 
     private Image backFace;
     private Image frontFace;
@@ -78,8 +80,7 @@ public class Card extends ImageView {
     }
 
     public static boolean isOppositeColor(Card card1, Card card2) {
-        //TODO
-        return true;
+        return card1.getColor(card1) != card2.getColor(card2);
     }
 
     public static boolean isSameSuit(Card card1, Card card2) {
@@ -121,6 +122,13 @@ public class Card extends ImageView {
                 cardFaceImages.put(cardId, new Image(imageFileName));
             }
         }
+    }
+
+    private String getColor(Card card) {
+        if (card.getSuit() == 1 || card.getSuit() == 2) {
+            return RED;
+        }
+        return BLACK;
     }
 
 }
