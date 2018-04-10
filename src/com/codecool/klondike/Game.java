@@ -45,7 +45,8 @@ public class Game extends Pane {
     };
 
     private EventHandler<MouseEvent> stockReverseCardsHandler = e -> {
-        refillStockFromDiscard();
+        if (stockPile.isEmpty()) 
+            refillStockFromDiscard();
     };
 
     private EventHandler<MouseEvent> onMousePressedHandler = e -> {
@@ -127,7 +128,14 @@ public class Game extends Pane {
     }
 
     public void refillStockFromDiscard() {
-        //TODO
+        
+        FXCollections.reverse(discardPile.getCards());
+        for (Card card : discardPile.getCards()) {
+            card.flip();
+            stockPile.addCard(card);
+        }
+        discardPile.clear();
+            
         System.out.println("Stock refilled from discard pile.");
     }
 
