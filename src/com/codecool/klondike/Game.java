@@ -88,29 +88,51 @@ public class Game extends Pane {
         if (draggedCards.isEmpty())
             return;
         Card card = (Card) e.getSource();
-        
         try {
-            Pile pile = getValidIntersectingPile(card, tableauPiles);
-            Card topCard = pile.getTopCard();
-            if (pile != null) {
+            Pile tableauPile = getValidIntersectingPile(card, tableauPiles);
+            Pile foundationPile = getValidIntersectingPile(card, foundationPiles);
                 
-                if (topCard == null && checkCardIsKing(card)) {
-                    handleValidMove(card, pile);
-                }
-    
-                else if (card.isOppositeColor(card, topCard) && isRankSmaller(card, topCard)) {
-                    handleValidMove(card, pile);
-                }
-    
-                else {
-                    invalidCardMove(draggedCards);
-                }
-            }
+                if (tableauPile != null) {
 
+                    Card topCard = tableauPile.getTopCard();
+                    
+                    if (topCard == null && checkCardRank(card, 13)) {
+                        handleValidMove(card, tableauPile);
+                    }
+        
+                    else if (card.isOppositeColor(card, topCard) && isRankSmaller(card, topCard)) {
+                        handleValidMove(card, tableauPile);
+                    }
+        
+                    else{
+                        draggedCards.forEach(MouseUtil::slideBack);
+                        draggedCards.clear();
+                    }
+                }
+                else if (foundationPile != null){
+                    
+                    Card topCard = foundationPile.getTopCard(); // wjebać dwa ify dla kupek na górz
+                    if (topCard == null && checkCardRank(card, 1)) {
+                        handleValidMove(card, foundationPile);
+                    }
+                    else if (card.isSameSuit(card, topCard) && isRankSmaller(topCard, card)){
+                        handleValidMove(card, foundationPile);
+                    }
+                    else{
+                        draggedCards.forEach(MouseUtil::slideBack);
+                        draggedCards.clear();
+                    }
+                }
+
+                else{
+                    draggedCards.forEach(MouseUtil::slideBack);
+                    draggedCards.clear();
+                }
         } catch (NullPointerException a) {
             System.out.println("Intercepted Null Pointer Error");
             invalidCardMove(draggedCards);
         }
+
     };
 
     public boolean isRankSmaller(Card card, Card topCard) {
@@ -121,8 +143,8 @@ public class Game extends Pane {
         }
     }
 
-    public boolean checkCardIsKing(Card card) {
-        if (card.getRank() == 13) {
+    public boolean checkCardRank(Card card , int rank) {
+        if (card.getRank() == rank) {
             return true;
         } else {
             return false;
