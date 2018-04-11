@@ -40,7 +40,12 @@ public class MouseUtil {
 
         if (destPile.isEmpty()) {
             targetX = destPile.getLayoutX();
-            targetY = destPile.getLayoutY();
+            if (destPile.getPileType() == Pile.PileType.TABLEAU){  
+                targetY = destPile.getLayoutY()-30;
+            }
+            else{
+                targetY = destPile.getLayoutY();
+            }
         } else {
             targetX = destPile.getTopCard().getLayoutX();
             targetY = destPile.getTopCard().getLayoutY();
