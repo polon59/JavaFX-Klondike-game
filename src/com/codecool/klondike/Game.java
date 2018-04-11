@@ -66,8 +66,12 @@ public class Game extends Pane {
         if (activePile.getPileType() == Pile.PileType.TABLEAU) {
             for (Card tableauCard : activePile.getCards()) {
                 if (!tableauCard.isFaceDown()) {
+                    if (isDraggedCardSmaller(tableauCard, card)) {
                     draggedCards.add(tableauCard);
+                } else {
+                    draggedCards.add(card);
                 }
+            }
             }
         } else {
             draggedCards.add(card);
@@ -293,6 +297,13 @@ public class Game extends Pane {
                 pile1.getTopCard().flip();
             }
         });
+    }
+    public boolean isDraggedCardSmaller(Card card, Card topCard) {
+        if (card.getRank() < topCard.getRank()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
