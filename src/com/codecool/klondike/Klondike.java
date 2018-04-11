@@ -54,6 +54,7 @@ public class Klondike extends Application {
         Button start = new Button("START NEW GAME");
         Button exit = new Button("EXIT");
 
+        start.setOnAction(e -> restartGame(primaryStage));
         dialogBox.getChildren().add(start);
         dialogBox.getChildren().add(exit);
     
