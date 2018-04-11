@@ -23,6 +23,7 @@ public class Game extends Pane {
 
     private Pile stockPile;
     private Pile discardPile;
+    private Boolean won;
     private List<Pile> foundationPiles = FXCollections.observableArrayList();
     private List<Pile> tableauPiles = FXCollections.observableArrayList();
 
@@ -164,12 +165,18 @@ public class Game extends Pane {
     }
 
     public boolean isGameWon() {
-        //TODO
-        return false;
+        int win = 0;
+        for (Pile foundationPile : foundationPiles){
+            System.out.println(foundationPile.numOfCards());
+            if (foundationPile.numOfCards() == 1)
+                win ++;
+        }
+        return (win == 1); 
     }
 
     public Game() {
         deck = Card.createNewDeck();
+        won = false;
         initPiles();
         dealCards();
     }
@@ -228,6 +235,9 @@ public class Game extends Pane {
         MouseUtil.slideToDest(draggedCards, destPile);
         draggedCards.clear();
         flipDownedCards();
+        this.won = isGameWon();
+        if (won)
+            System.out.println("gowno dziala");
 
     }
 
@@ -294,9 +304,12 @@ public class Game extends Pane {
 
     public void flipDownedCards() {
         Iterator<Pile> fliper = tableauPiles.iterator();
-        fliper.forEachRemaining(pile1 -> {
-            if (pile1.getTopCard().isFaceDown()) {
-                pile1.getTopCard().flip();
+        fliper.forEachRemaining(tableauPile -> {
+            System.out.println(tableauPile.numOfCards());
+            if (tableauPile.numOfCards() != 0){
+                if (tableauPile.getTopCard().isFaceDown()) {
+                    tableauPile.getTopCard().flip();
+                }
             }
         });
     }
@@ -307,5 +320,4 @@ public class Game extends Pane {
             return false;
         }
     }
-
 }

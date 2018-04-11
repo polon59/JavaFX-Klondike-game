@@ -10,12 +10,14 @@ import javafx.scene.paint.Color;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Iterator;
 
 public class Pile extends Pane {
 
     private PileType pileType;
     private String name;
     private double cardGap;
+    private int counter;
     private ObservableList<Card> cards = FXCollections.observableArrayList();
 
     public Pile(PileType pileType, String name, double cardGap) {
@@ -40,8 +42,11 @@ public class Pile extends Pane {
     }
 
     public int numOfCards() {
-        //TODO
-        return 1;
+        counter = 0;
+        for (Card card : cards){
+            counter ++;
+        }
+        return counter;
     }
 
     public boolean isEmpty() {
