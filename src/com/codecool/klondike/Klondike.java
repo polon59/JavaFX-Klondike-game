@@ -48,9 +48,9 @@ public class Klondike extends Application {
 
     public void initializeButtons(Game game, Stage primaryStage){
         initializeNewGameButton(game, primaryStage);
-        initializeThemesButton(game);
         initializeUndoButton(game);
     }
+
     private void initializeNewGameButton(Game game, Stage stage){
         newGame = new Button("New Game");
         newGame.setLayoutY(10);
@@ -58,28 +58,21 @@ public class Klondike extends Application {
         newGame.setOnAction(e -> restartGame(stage));
         game.getChildren().add(newGame);
     }
+
     public void restartGame(Stage stage){
         stage.close();
         start(stage);
     }
-    private void initializeThemesButton(Game game){
-        settingsButton = new Button("Undo Move");
-        settingsButton.setLayoutY(40);
-        settingsButton.setLayoutX(10);
-        settingsButton.setOnAction(e -> {
-        //SettingsBox.display("Settings", "", game);
-        });
-        game.getChildren().add(settingsButton);
-    }
+
     private void initializeUndoButton(Game game){
-        // undo = new Button("Undo");
-        // undo.setLayoutY(70);
-        // undo.setLayoutX(10);
-        // undo.setOnAction(e -> {
-        //     System.out.println("Undo");
-        //     game.getMoves().loadUndoMove();
-        // });
-        // game.getChildren().add(undo);
+        undo = new Button("Undo");
+        undo.setLayoutY(40);
+        undo.setLayoutX(10);
+        undo.setOnAction(e -> {
+            System.out.println("Undo move");
+            // implement undo move action
+        });
+        game.getChildren().add(undo);
     }
 }
 
