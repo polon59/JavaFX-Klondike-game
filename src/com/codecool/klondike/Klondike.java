@@ -1,9 +1,13 @@
 package com.codecool.klondike;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -26,16 +30,27 @@ public class Klondike extends Application {
         primaryStage.setScene(new Scene(game, WINDOW_WIDTH, WINDOW_HEIGHT));
         primaryStage.show();
 
-        if (game.isGameWon()) {
+        // if (game.isGameWon()) {
         final Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.initOwner(primaryStage);
-        VBox dialogBox = new VBox(20);
-        dialogBox.getChildren().add(new Text("TEST"));
-        Scene dialogScene = new Scene(dialogBox, 300, 50);
+        VBox dialogBox = new VBox(50);
+        dialogBox.getChildren().add(new Text("CONGRATULATIONS! YOU WON!"));
+        Scene dialogScene = new Scene(dialogBox, 300, 200);
         dialog.setScene(dialogScene);
+        dialogBox.setPadding(new Insets(10, 50, 50, 50));
+        dialogBox.setSpacing(10);
+
+        
+
+        Button start = new Button("START NEW GAME");
+        Button exit = new Button("EXIT");
+
+        dialogBox.getChildren().add(start);
+        dialogBox.getChildren().add(exit);
+    
         dialog.show();
-        }
+
     }
 
 }
