@@ -105,21 +105,16 @@ public class Klondike extends Application {
         changeTheme.setOnAction(e -> {
             System.out.println(backgroundsChange);
             if (this.backgroundsChange == 0){
-                game.setTableBackground(this.backgrounds[1]);
+                game.setTableBackground(this.backgrounds[0]);
                 this.backgroundsChange = 1;
             }
             else{
-                game.setTableBackground(this.backgrounds[0]);
+                game.setTableBackground(this.backgrounds[1]);
                 this.backgroundsChange = 0;
             }
         });
         game.getChildren().add(changeTheme);
     }
-
-    // private void backgroundsChangeSetter(int value){
-    //     this.backgroundsChange = value;
-    // }
-
 }
 
 
