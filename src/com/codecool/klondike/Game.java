@@ -33,6 +33,15 @@ public class Game extends Pane {
     private static double FOUNDATION_GAP = 0;
     private static double TABLEAU_GAP = 30;
 
+
+
+    private Card lastUsedCard;
+    private Pile lastUsedCardPile;
+
+    private List<Card> usedCards = new ArrayList<>();
+
+
+
     private EventHandler<MouseEvent> onMouseClickedHandler = e -> {
         Card card = (Card) e.getSource();
         if (card.getContainingPile().getPileType() == Pile.PileType.STOCK) {
@@ -94,9 +103,21 @@ public class Game extends Pane {
         if (draggedCards.isEmpty())
             return;
         Card card = (Card) e.getSource();
+        lastUsedCard = card;
         try {
             Pile tableauPile = getValidIntersectingPile(card, tableauPiles);
             Pile foundationPile = getValidIntersectingPile(card, foundationPiles);
+
+            if (usedCards != null){usedCards.clear();
+
+            for (int a =0; a < draggedCards.size(); a ++){
+                usedCards.add(draggedCards.get(a));
+
+            }
+        }
+
+            lastUsedCardPile = card.getContainingPile();
+            
                 
                 if (tableauPile != null) {
 
@@ -112,12 +133,11 @@ public class Game extends Pane {
         
                     else{
                         draggedCards.forEach(MouseUtil::slideBack);
-                        draggedCards.clear();
                     }
                 }
                 else if (foundationPile != null){
                     
-                    Card topCard = foundationPile.getTopCard(); // wjebać dwa ify dla kupek na górz
+                    Card topCard = foundationPile.getTopCard();
                     if (topCard == null && checkCardRank(card, 1)) {
                         handleValidMove(card, foundationPile);
                     }
@@ -126,20 +146,34 @@ public class Game extends Pane {
                     }
                     else{
                         draggedCards.forEach(MouseUtil::slideBack);
-                        draggedCards.clear();
                     }
                 }
 
                 else{
                     draggedCards.forEach(MouseUtil::slideBack);
-                    draggedCards.clear();
                 }
         } catch (NullPointerException a) {
             System.out.println("Intercepted Null Pointer Error");
             invalidCardMove(draggedCards);
         }
-
+        draggedCards.clear();
     };
+
+    protected void undoMove(){
+        if (usedCards != null && lastUsedCard != null){
+            System.out.println("SIZE" + usedCards.size());
+            lastUsedCardPile.getTopCard().flip();
+            for (int i =0; i < usedCards.size(); i ++){
+                usedCards.get(i).moveToPile(lastUsedCardPile);
+                System.out.println("undo card");
+            }
+            usedCards.clear();
+            lastUsedCard = null;
+        }
+       
+
+
+    }
 
     public boolean isRankSmaller(Card card, Card topCard) {
         if (card.getRank() == topCard.getRank() - 1) {
@@ -230,6 +264,7 @@ public class Game extends Pane {
         flipDownedCards();
 
     }
+
 
     private void initPiles() {
         int amount;
