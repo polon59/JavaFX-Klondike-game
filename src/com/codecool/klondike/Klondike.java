@@ -1,5 +1,7 @@
 package com.codecool.klondike;
 
+import java.util.ArrayList;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -20,6 +22,9 @@ public class Klondike extends Application {
 
     private static final double WINDOW_WIDTH = 1400;
     private static final double WINDOW_HEIGHT = 900;
+    private final Image[] backgrounds = {new Image("/table/green.png"),new Image("/table/green1.png")};
+    private int backgroundsChange;
+
     Button settingsButton;
     Button newGame;
     Button undo;
@@ -30,9 +35,10 @@ public class Klondike extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        this.backgroundsChange = 1;
         Card.loadCardImages();
         Game game = new Game(primaryStage);
-        game.setTableBackground(new Image("/table/green.png"));
+        game.setTableBackground(backgrounds[0]);
         
         initializeButtons(game, primaryStage);
         primaryStage.setTitle("Klondike Solitaire");
@@ -43,6 +49,7 @@ public class Klondike extends Application {
     public void initializeButtons(Game game, Stage primaryStage){
         initializeNewGameButton(game, primaryStage);
         initializeUndoButton(game);
+        initializeThemeButton(game, primaryStage);
     }
 
     private void initializeNewGameButton(Game game, Stage stage){
@@ -67,6 +74,24 @@ public class Klondike extends Application {
             // implement undo move action
         });
         game.getChildren().add(undo);
+    }
+
+    private void initializeThemeButton(Game game, Stage stage){
+        Button changeTheme = new Button("Change theme");
+        changeTheme.setLayoutY(70);
+        changeTheme.setLayoutX(10);
+        changeTheme.setOnAction(e -> {
+            System.out.println(backgroundsChange);
+            if (this.backgroundsChange == 0){
+                game.setTableBackground(this.backgrounds[0]);
+                this.backgroundsChange = 1;
+            }
+            else{
+                game.setTableBackground(this.backgrounds[1]);
+                this.backgroundsChange = 0;
+            }
+        });
+        game.getChildren().add(changeTheme);
     }
 }
 

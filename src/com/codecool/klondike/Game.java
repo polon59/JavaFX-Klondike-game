@@ -58,7 +58,11 @@ public class Game extends Pane {
             card.flip();
             card.setMouseTransparent(false);
             System.out.println("Placed " + card + " to the waste.");
-        } 
+        }
+
+        if (e.getClickCount() == 2 && draggedCards.isEmpty()) {
+            doubleClick(card);
+        }
     };
 
     private EventHandler<MouseEvent> stockReverseCardsHandler = e -> {
@@ -110,6 +114,14 @@ public class Game extends Pane {
 
     };
 
+    // public void handle(MouseEvent mouseEvent) {
+    //     if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+    //         if(mouseEvent.getClickCount() == 2){
+    //             System.out.println("Double clicked");
+    //         }
+    //     }
+    // }
+
     private EventHandler<MouseEvent> onMouseReleasedHandler = e -> {
         if (draggedCards.isEmpty())
             return;
@@ -124,20 +136,18 @@ public class Game extends Pane {
 
                 if (topCard == null && checkCardRank(card, 13)) {
                     handleValidMove(card, tableauPile);
-                }
-
-                else if (card.isOppositeColor(card, topCard) && isRankSmaller(card, topCard)) {
+                } else if (card.isOppositeColor(card, topCard) && isRankSmaller(card, topCard)) {
                     handleValidMove(card, tableauPile);
+                } else {
+                    draggedCards.forEach(MouseUtil::slideBack);
                 }
 
-                else {
-                    draggedCards.forEach(MouseUtil::slideBack);
-                    draggedCards.clear();
-                }
             } else if (foundationPile != null) {
 
-                Card topCard = foundationPile.getTopCard(); // wjebać dwa ify dla kupek na górz
-                if (topCard == null && checkCardRank(card, 1)) {
+                Card topCard = foundationPile.getTopCard();
+                if (topCard == null &&
+
+                        checkCardRank(card, 1)) {
                     handleValidMove(card, foundationPile);
                 } else if (card.isSameSuit(card, topCard) && isRankSmaller(topCard, card)) {
                     handleValidMove(card, foundationPile);
@@ -147,7 +157,9 @@ public class Game extends Pane {
                 }
             }
 
-            else {
+            else
+
+            {
                 draggedCards.forEach(MouseUtil::slideBack);
                 draggedCards.clear();
             }
@@ -155,8 +167,33 @@ public class Game extends Pane {
             System.out.println("Intercepted Null Pointer Error");
             invalidCardMove(draggedCards);
         }
-
+        draggedCards.clear();
     };
+
+    public void doubleClick(Card card) {
+        System.out.println(card.getRank());
+        if (card.getRank() == 1) {
+            for (Pile pile : foundationPiles) {
+                if (pile.isEmpty()) {
+                    draggedCards.add(card);
+                    handleValidMove(card, pile);
+                    break;
+                }
+            }
+        } else {
+            for (Pile pile : foundationPiles) {
+                if (pile.isEmpty() == false) {
+                    if (pile.getTopCard().getSuit() == card.getSuit()
+                            && pile.getTopCard().getRank() + 1 == card.getRank()) {
+                        draggedCards.add(card);
+                        handleValidMove(card, pile);
+                        break;
+                    }
+
+                }
+            }
+        }
+    }
 
     public boolean isRankSmaller(Card card, Card topCard) {
         if (card.getRank() == topCard.getRank() - 1) {
@@ -183,7 +220,6 @@ public class Game extends Pane {
     public boolean isGameWon() {
         int win = 0;
         for (Pile foundationPile : foundationPiles) {
-            System.out.println(foundationPile.numOfCards());
             if (foundationPile.numOfCards() == 13)
                 win++;
         }
@@ -204,13 +240,6 @@ public class Game extends Pane {
         card.setOnMouseDragged(onMouseDraggedHandler);
         card.setOnMouseReleased(onMouseReleasedHandler);
         card.setOnMouseClicked(onMouseClickedHandler);
-    }
-
-    public void removeMouseEventHandlers(Card card) {
-        card.setOnMousePressed(null);
-        card.setOnMouseDragged(null);
-        card.setOnMouseReleased(null);
-        card.setOnMouseClicked(null);
     }
 
     public void refillStockFromDiscard() {
@@ -257,11 +286,14 @@ public class Game extends Pane {
             msg = String.format("Placed %s to %s.", card, destPile.getTopCard());
         }
         System.out.println(msg);
+        if (draggedCards.isEmpty())
+            draggedCards.add(card);
         MouseUtil.slideToDest(draggedCards, destPile);
         draggedCards.clear();
         flipDownedCards();
+
+        
         if (isPossibleEnd()) {
-            System.out.println("TEST");
             automaticEnd();
         }
         this.won = isGameWon();
@@ -336,7 +368,6 @@ public class Game extends Pane {
     public void flipDownedCards() {
         Iterator<Pile> fliper = tableauPiles.iterator();
         fliper.forEachRemaining(tableauPile -> {
-            System.out.println(tableauPile.numOfCards());
             if (tableauPile.numOfCards() != 0) {
                 if (tableauPile.getTopCard().isFaceDown()) {
                     tableauPile.getTopCard().flip();
@@ -357,14 +388,14 @@ public class Game extends Pane {
         for (Pile foundationPile : foundationPiles) {
             Card topCard = foundationPile.getTopCard();
             for (Pile tableuPile : tableauPiles) {
-            for (Card card : tableuPile.getCards()) {
-                if (isRankSmaller(topCard, card) && card.isSameSuit(card, topCard)) {
-                    draggedCards.add(card);
-                    handleValidMove(card, topCard.getContainingPile());
+                for (Card card : tableuPile.getCards()) {
+                    if (isRankSmaller(topCard, card) && card.isSameSuit(card, topCard)) {
+                        draggedCards.add(card);
+                        handleValidMove(card, topCard.getContainingPile());
+                    }
                 }
             }
         }
-    }
 
     }
 
@@ -377,8 +408,10 @@ public class Game extends Pane {
                 }
             }
             return true;
-        } else return false; 
+        } else
+            return false;
     }
+
     public void initializeDialogBox() {
         Stage dialog = new Stage();
         dialog.initModality(Modality.WINDOW_MODAL);
@@ -390,8 +423,6 @@ public class Game extends Pane {
         dialogBox.setPadding(new Insets(10, 50, 50, 50));
         dialogBox.setSpacing(10);
 
-        
-
         Button start = new Button("START NEW GAME");
         Button exit = new Button("EXIT");
 
@@ -401,7 +432,6 @@ public class Game extends Pane {
         dialogBox.getChildren().add(exit);
         dialog.initStyle(StageStyle.UNDECORATED);
 
-    
         dialog.show();
-}
+    }
 }
