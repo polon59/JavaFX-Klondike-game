@@ -34,13 +34,17 @@ public class Game extends Pane {
     private static double FOUNDATION_GAP = 0;
     private static double TABLEAU_GAP = 30;
 
-    private EventHandler<MouseEvent> onMouseClickedHandler = e -> {
+    private EventHandler<MouseEvent> onMouseClickedHandler = e -> { 
         Card card = (Card) e.getSource();
         if (card.getContainingPile().getPileType() == Pile.PileType.STOCK) {
             card.moveToPile(discardPile);
             card.flip();
             card.setMouseTransparent(false);
             System.out.println("Placed " + card + " to the waste.");
+        }
+
+        if(e.getClickCount() == 2 && draggedCards.isEmpty()){
+            doubleClick(card);
         }
     };
 
@@ -91,6 +95,15 @@ public class Game extends Pane {
 
     };
 
+
+    // public void handle(MouseEvent mouseEvent) {
+    //     if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+    //         if(mouseEvent.getClickCount() == 2){
+    //             System.out.println("Double clicked");
+    //         }
+    //     }
+    // }
+
     private EventHandler<MouseEvent> onMouseReleasedHandler = e -> {
         if (draggedCards.isEmpty())
             return;
@@ -118,11 +131,12 @@ public class Game extends Pane {
                 }
                 else if (foundationPile != null){
                     
-                    Card topCard = foundationPile.getTopCard(); // wjebać dwa ify dla kupek na górz
-                    if (topCard == null && checkCardRank(card, 1)) {
+                    Card topCard = foundationPile.getTopCard();
+
+                    if (topCard == null && checkCardRank(card, 1) && draggedCards.size()==1) {
                         handleValidMove(card, foundationPile);
                     }
-                    else if (card.isSameSuit(card, topCard) && isRankSmaller(topCard, card)){
+                    else if (card.isSameSuit(card, topCard) && isRankSmaller(topCard, card) && draggedCards.size()==1){
                         handleValidMove(card, foundationPile);
                     }
                     else{
@@ -141,6 +155,31 @@ public class Game extends Pane {
         }
 
     };
+
+    public void doubleClick(Card card){
+            System.out.println(card.getRank());
+            if (card.getRank() == 1){
+                for (Pile pile : foundationPiles){
+                    if (pile.isEmpty()){
+                        draggedCards.add(card);
+                        handleValidMove(card, pile);
+                        break;
+                    }
+                }
+            }
+            else {
+                for (Pile pile : foundationPiles){
+                    if (pile.isEmpty() == false){
+                        if (pile.getTopCard().getSuit() == card.getSuit() && pile.getTopCard().getRank()+1 == card.getRank()){
+                            draggedCards.add(card);
+                            handleValidMove(card, pile);
+                            break;
+                        }
+                        
+                    }
+                }
+            }
+    }
 
     public boolean isRankSmaller(Card card, Card topCard) {
         if (card.getRank() == topCard.getRank() - 1) {
@@ -167,7 +206,6 @@ public class Game extends Pane {
     public boolean isGameWon() {
         int win = 0;
         for (Pile foundationPile : foundationPiles){
-            System.out.println(foundationPile.numOfCards());
             if (foundationPile.numOfCards() == 1)
                 win ++;
         }
@@ -232,6 +270,8 @@ public class Game extends Pane {
             msg = String.format("Placed %s to %s.", card, destPile.getTopCard());
         }
         System.out.println(msg);
+        if (draggedCards.isEmpty())
+            draggedCards.add(card);
         MouseUtil.slideToDest(draggedCards, destPile);
         draggedCards.clear();
         flipDownedCards();
@@ -305,7 +345,6 @@ public class Game extends Pane {
     public void flipDownedCards() {
         Iterator<Pile> fliper = tableauPiles.iterator();
         fliper.forEachRemaining(tableauPile -> {
-            System.out.println(tableauPile.numOfCards());
             if (tableauPile.numOfCards() != 0){
                 if (tableauPile.getTopCard().isFaceDown()) {
                     tableauPile.getTopCard().flip();
