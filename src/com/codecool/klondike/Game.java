@@ -56,6 +56,9 @@ public class Game extends Pane {
     private List<Card> usedCards = new ArrayList<>();
 
     private EventHandler<MouseEvent> onMouseClickedHandler = e -> {
+        if (MouseUtil.duringAnimation) {
+            return;
+        }
         Card card = (Card) e.getSource();
         if (card.getContainingPile().getPileType() == Pile.PileType.STOCK) {
             card = stockPile.getTopCard();
@@ -65,7 +68,7 @@ public class Game extends Pane {
             System.out.println("Placed " + card + " to the waste.");
         }
 
-        if (e.getClickCount() == 2 && draggedCards.isEmpty()) {
+        if (e.getClickCount() == 2 && draggedCards.isEmpty() && !card.isFaceDown()) {
             doubleClick(card);
         }
     };
@@ -81,6 +84,9 @@ public class Game extends Pane {
     };
 
     private EventHandler<MouseEvent> onMouseDraggedHandler = e -> {
+        if (MouseUtil.duringAnimation) {
+            return;
+        }
         Card card = (Card) e.getSource();
         Pile activePile = card.getContainingPile();
         if (activePile.getPileType() == Pile.PileType.STOCK)
@@ -119,22 +125,19 @@ public class Game extends Pane {
 
     };
 
-    // public void handle(MouseEvent mouseEvent) {
-    //     if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
-    //         if(mouseEvent.getClickCount() == 2){
-    //             System.out.println("Double clicked");
-    //         }
-    //     }
-    // }
 
     private EventHandler<MouseEvent> onMouseReleasedHandler = e -> {
+        if (MouseUtil.duringAnimation) {
+            return;
+        }
         if (draggedCards.isEmpty())
             return;
         Card card = (Card) e.getSource();
         lastUsedCard = card;
+        Pile tableauPile = getValidIntersectingPile(card, tableauPiles);
+        Pile foundationPile = getValidIntersectingPile(card, foundationPiles);
+        
         try {
-            Pile tableauPile = getValidIntersectingPile(card, tableauPiles);
-            Pile foundationPile = getValidIntersectingPile(card, foundationPiles);
 
             if (usedCards != null) {
                 usedCards.clear();
@@ -146,49 +149,68 @@ public class Game extends Pane {
             }
 
             lastUsedCardPile = card.getContainingPile();
-
-            if (tableauPile != null) {
-
-                Card topCard = tableauPile.getTopCard();
-
-                if (topCard == null && checkCardRank(card, 13)) {
-                    handleValidMove(card, tableauPile);
-                }
-
-                else if (card.isOppositeColor(card, topCard) && isRankSmaller(card, topCard)) {
-                    handleValidMove(card, tableauPile);
-                }
-
-                else {
-                    draggedCards.forEach(MouseUtil::slideBack);
-                }
-            } else if (foundationPile != null) {
-
-                Card topCard = foundationPile.getTopCard();
-                if (topCard == null && checkCardRank(card, 1)) {
-                    handleValidMove(card, foundationPile);
-                } else if (card.isSameSuit(card, topCard) && isRankSmaller(topCard, card)) {
-                    handleValidMove(card, foundationPile);
-                } else {
-                    draggedCards.forEach(MouseUtil::slideBack);
-                }
-            }
-
-            else
-
-            {
-                draggedCards.forEach(MouseUtil::slideBack);
-                draggedCards.clear();
-            }
-
-        } catch (NullPointerException a) {
-            System.out.println("Intercepted Null Pointer Error");
-            invalidCardMove(draggedCards);
         }
-        draggedCards.clear();
+            catch (NullPointerException a) {
+                System.out.println("Intercepted Null Pointer Error");
+                invalidCardMove(draggedCards);
+            }
+            cardPlacementLogic(card, tableauPile, foundationPile);
+
+            
     };
 
+    public void cardPlacementLogic(Card card, Pile tableauPile, Pile foundationPile){
+
+        if (MouseUtil.duringAnimation) {
+            return;
+        }
+
+        try {
+        if (tableauPile != null) {
+
+            Card topCard = tableauPile.getTopCard();
+
+            if (topCard == null && checkCardRank(card, 13)) {
+                handleValidMove(card, tableauPile);
+            }
+
+            else if (card.isOppositeColor(card, topCard) && isRankSmaller(card, topCard)) {
+                handleValidMove(card, tableauPile);
+            }
+
+            else {
+                draggedCards.forEach(MouseUtil::slideBack);
+            }
+        } else if (foundationPile != null) {
+
+            Card topCard = foundationPile.getTopCard();
+            if (topCard == null && checkCardRank(card, 1)) {
+                handleValidMove(card, foundationPile);
+            } else if (card.isSameSuit(card, topCard) && isRankSmaller(topCard, card)) {
+                handleValidMove(card, foundationPile);
+            } else {
+                draggedCards.forEach(MouseUtil::slideBack);
+            }
+        }
+
+        else
+
+        {
+            draggedCards.forEach(MouseUtil::slideBack);
+            draggedCards.clear();
+        }
+    }
+
+     catch (NullPointerException a) {
+        System.out.println("Intercepted Null Pointer Error");
+        invalidCardMove(draggedCards);
+    }
+    draggedCards.clear();
+    }
     public void doubleClick(Card card) {
+        if (MouseUtil.duringAnimation) {
+            return;
+        }
         if (card.getRank() == 1) {
             for (Pile pile : foundationPiles) {
                 if (pile.isEmpty()) {
@@ -397,13 +419,13 @@ public class Game extends Pane {
     public void flipDownedCards() {
         Iterator<Pile> fliper = tableauPiles.iterator();
         fliper.forEachRemaining(tableauPile -> {
-            if (tableauPile.numOfCards() != 0) {
+            if (!tableauPile.isEmpty()) {
                 if (tableauPile.getTopCard().isFaceDown()) {
                     tableauPile.getTopCard().flip();
                 }
             }
         });
-        if (discardPile.getTopCard().isFaceDown()) {
+        if (!discardPile.isEmpty() && discardPile.getTopCard().isFaceDown()) {
             discardPile.getTopCard().flip();
         }
 
@@ -459,7 +481,10 @@ public class Game extends Pane {
         Button start = new Button("START NEW GAME");
         Button exit = new Button("EXIT");
 
-        start.setOnAction(e -> new Game(primaryStage));
+        start.setOnAction(e -> {
+            Klondike newGame = new Klondike();
+            newGame.start(primaryStage);
+            dialog.hide();});
         exit.setOnAction(e -> primaryStage.close());
         dialogBox.getChildren().add(start);
         dialogBox.getChildren().add(exit);

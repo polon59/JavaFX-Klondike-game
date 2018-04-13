@@ -49,7 +49,7 @@ public class Klondike extends Application {
     public void initializeButtons(Game game, Stage primaryStage){
         initializeNewGameButton(game, primaryStage);
         initializeUndoButton(game);
-        initializeThemeButton(game, primaryStage);
+        initializeThemeButton(game);
     }
 
     private void initializeNewGameButton(Game game, Stage stage){
@@ -71,12 +71,11 @@ public class Klondike extends Application {
         undo.setLayoutX(500);
         undo.setOnAction(e -> {
             game.undoMove();
-            // implement undo move action
         });
         game.getChildren().add(undo);
     }
 
-    private void initializeThemeButton(Game game, Stage stage){
+    private void initializeThemeButton(Game game){
         Button changeTheme = new Button("Change theme");
         changeTheme.setLayoutY(70);
         changeTheme.setLayoutX(470);

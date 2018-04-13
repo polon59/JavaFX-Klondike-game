@@ -18,7 +18,10 @@ import java.util.List;
 
 public class MouseUtil {
 
+    public static boolean duringAnimation = false;
+
     public static void slideBack(Card card) {
+        duringAnimation = true;
         double sourceX = card.getLayoutX() + card.getTranslateX();
         double sourceY = card.getLayoutY() + card.getTranslateY();
         double targetX = card.getLayoutX();
@@ -28,12 +31,14 @@ public class MouseUtil {
                     card.getDropShadow().setRadius(2);
                     card.getDropShadow().setOffsetX(0);
                     card.getDropShadow().setOffsetY(0);
+                    duringAnimation = false;
                 });
     }
 
     public static void slideToDest(List<Card> cardsToSlide, Pile destPile) {
         if (cardsToSlide == null)
             return;
+        duringAnimation = true;
         double destCardGap = destPile.getCardGap();
         double targetX;
         double targetY;
@@ -63,6 +68,7 @@ public class MouseUtil {
                         currentCard.getDropShadow().setRadius(2);
                         currentCard.getDropShadow().setOffsetX(0);
                         currentCard.getDropShadow().setOffsetY(0);
+                        duringAnimation = false;
                     });
         }
     }
