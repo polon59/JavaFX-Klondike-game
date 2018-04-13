@@ -189,7 +189,6 @@ public class Game extends Pane {
     };
 
     public void doubleClick(Card card) {
-        System.out.println(card.getRank());
         if (card.getRank() == 1) {
             for (Pile pile : foundationPiles) {
                 if (pile.isEmpty()) {
@@ -404,6 +403,10 @@ public class Game extends Pane {
                 }
             }
         });
+        if (discardPile.getTopCard().isFaceDown()) {
+            discardPile.getTopCard().flip();
+        }
+
     }
 
     public boolean isDraggedCardSmaller(Card card, Card topCard) {
